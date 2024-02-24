@@ -1,0 +1,21 @@
+{
+  "name": "com.onedevapp.gameguard",
+  "displayName": "Android GameGurad",
+  "version": "1.0.0",
+  "documentationUrl": "https://github.com/onedevapp/Unity_GameGuard_Android/blob/main/.github/README.md",
+  "changelogUrl": "",
+  "licensesUrl": "https://github.com/onedevapp/Unity_GameGuard_Android/blob/main/LICENSE",
+  "author": {
+    "name": "OneDevApp",
+    "email": "onedevapp@gmail.com",
+    "url": "https://github.com/onedevapp/Unity_GameGuard_Android"
+  },
+  "samples": [
+    {
+        "displayName": "GameGurad Demo",
+        "description": "Contains sample for GameGurad",
+        "path": "Samples~/Samples"
+    }
+  ],
+  "description": "This unity plugin provides an extra layer of security to your game from being pirated / cracked / running in clone space or in emulator and more.. This library protects your game against simple tampering attacks. BUT, this isn't guaranteed to stop your app from getting pirated. There is no such thing as 100% security, and a determined and skilled attacker with enough time, could remove these checks from the code. The real objective here is to raise the bar out of reach of opportunist and automatic attackers. \nNote: currently supported platform is Android only.\n\n"
+}
