@@ -324,101 +324,50 @@ public class VerifyAppGuard {
 
     private boolean isEmulator()
     {
-        String manufacturer = "", brand = "", fingerprint = "", product = "", device = "", model = "", hardware = "";
-
-        try {
-            manufacturer = Build.MANUFACTURER;
-        } catch (Exception e) {}
-
-        try {
-            brand = Build.BRAND;
-        } catch (Exception e) {}
-
-        try {
-            fingerprint = Build.FINGERPRINT;
-        } catch (Exception e) {}
-
-        try {
-            product = Build.PRODUCT;
-        } catch (Exception e) {}
-
-        try {
-            device = Build.DEVICE;
-        } catch (Exception e) {}
-
-        try {
-            model = Build.MODEL;
-        } catch (Exception e) {}
-
-        try {
-            hardware = Build.HARDWARE;
-        } catch (Exception e) {}
-
-        logBuilder.append("Build.MANUFACTURER:::").append(manufacturer).append("\n");
-        logBuilder.append("Build.BRAND:::").append(brand).append("\n");
-        logBuilder.append("Build.FINGERPRINT:::").append(fingerprint).append("\n");
-        logBuilder.append("Build.PRODUCT:::").append(product).append("\n");
-        logBuilder.append("Build.MODEL:::").append(model).append("\n");
-        logBuilder.append("Build.DEVICE:::").append(device).append("\n");
-        logBuilder.append("Build.HARDWARE:::").append(hardware).append("\n");
+        logBuilder.append("Build.MANUFACTURER:::").append(Build.MANUFACTURER).append("\n");
+        logBuilder.append("Build.BRAND:::").append(Build.BRAND).append("\n");
+        logBuilder.append("Build.FINGERPRINT:::").append(Build.FINGERPRINT).append("\n");
+        logBuilder.append("Build.PRODUCT:::").append(Build.PRODUCT).append("\n");
+        logBuilder.append("Build.MODEL:::").append(Build.MODEL).append("\n");
+        logBuilder.append("Build.BOARD:::").append(Build.BOARD).append("\n");
+        logBuilder.append("Build.HOST:::").append(Build.HOST).append("\n");
+        logBuilder.append("Build.DEVICE:::").append(Build.DEVICE).append("\n");
+        logBuilder.append("Build.HARDWARE:::").append(Build.HARDWARE).append("\n");
         logBuilder.append("--------------------------------").append("\n");
 
-        int ratingCheckEmulator = 0;
-
-        if (product.contains("sdk") || product.contains("Andy") ||
-                product.contains("ttVM_Hdragon") || product.contains("google_sdk") ||
-                product.contains("Droid4X") || product.contains("nox") ||
-                product.contains("sdk_x86") || product.contains("sdk_google") ||
-                product.contains("vbox86p")) {
-            ratingCheckEmulator++;
-        }
-
-
-        if (manufacturer.equalsIgnoreCase("unknown") || manufacturer.equalsIgnoreCase("Genymotion") ||
-                manufacturer.contains("Andy") || manufacturer.contains("MIT") ||
-                manufacturer.contains("nox") || manufacturer.contains("TiantianVM")) {
-            ratingCheckEmulator++;
-        }
-
-        if (brand.equalsIgnoreCase("generic") || brand.equalsIgnoreCase("generic_x86") ||
-                brand.equalsIgnoreCase("TTVM") || brand.contains("Andy")) {
-            ratingCheckEmulator++;
-        }
-
-        if (device.contains("generic") || device.contains("generic_x86") ||
-                device.contains("Andy") || device.contains("ttVM_Hdragon") ||
-                device.contains("Droid4X") || device.contains("nox") ||
-                device.contains("generic_x86_64") || device.contains("vbox86p")) {
-            ratingCheckEmulator++;
-        }
-
-        if (model.equalsIgnoreCase("sdk") || model.equalsIgnoreCase("google_sdk") ||
-                model.contains("Droid4X") || model.contains("TiantianVM") ||
-                model.contains("Andy") || model.equalsIgnoreCase(
-                "Android SDK built for x86_64") ||
-                model.equalsIgnoreCase("Android SDK built for x86")) {
-            ratingCheckEmulator++;
-        }
-
-        if (hardware.equalsIgnoreCase("goldfish") || hardware.equalsIgnoreCase("vbox86") ||
-                hardware.contains("nox") || hardware.contains("ttVM_x86")) {
-            ratingCheckEmulator++;
-        }
-
-        if (fingerprint.contains("generic") ||
-                fingerprint.contains("generic/sdk/generic") ||
-                fingerprint.contains("generic_x86/sdk_x86/generic_x86") ||
-                fingerprint.contains("Andy") || fingerprint.contains("ttVM_Hdragon") ||
-                fingerprint.contains("generic_x86_64") ||
-                fingerprint.contains("generic/google_sdk/generic") ||
-                fingerprint.contains("vbox86p") ||
-                fingerprint.contains("generic/vbox86p/vbox86p")) {
-            ratingCheckEmulator++;
-        }
-
-
-        return ratingCheckEmulator > 3;
-
+        return ((Build.MANUFACTURER == "Google" && Build.BRAND == "google" &&
+                ((Build.FINGERPRINT.startsWith("google/sdk_gphone_")
+                        && Build.FINGERPRINT.endsWith(":user/release-keys")
+                        && Build.PRODUCT.startsWith("sdk_gphone_")
+                        && Build.MODEL.startsWith("sdk_gphone_"))
+                        //alternative
+                        || (Build.FINGERPRINT.startsWith("google/sdk_gphone64_")
+                        && (Build.FINGERPRINT.endsWith(":userdebug/dev-keys") || Build.FINGERPRINT.endsWith(":user/release-keys"))
+                        && Build.PRODUCT.startsWith("sdk_gphone64_")
+                        && Build.MODEL.startsWith("sdk_gphone64_"))))
+                //
+                || Build.PRODUCT.contains("simulator")
+                || Build.PRODUCT.contains("sdk_gphone64_arm64")
+                || Build.FINGERPRINT.startsWith("generic")
+                || Build.FINGERPRINT.startsWith("unknown")
+                || Build.FINGERPRINT.equals("robolectric")
+                || Build.MODEL.contains("google_sdk")
+                || Build.MODEL.contains("Emulator")
+                || Build.MODEL.contains("Android SDK built for x86")
+                //bluestacks
+                || Build.MANUFACTURER.contains("Geny")
+                || Build.HOST.startsWith("Build")
+                || Build.MANUFACTURER.equals("unknown")
+                //MSI App Player
+                || Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")
+                || Build.PRODUCT == "google_sdk"
+                //nox
+                || Build.PRODUCT.toLowerCase().contains("nox")
+                || Build.BOARD.toLowerCase().contains("nox")
+                // another Android SDK emulator check
+                || Build.DEVICE.equals("vbox86p")
+                || Build.HARDWARE.equals("goldfish")
+                || Build.HARDWARE.equals("vbox86"));
     }
 
     private boolean detectDebugger() {
