@@ -7,15 +7,10 @@ This library protects your game against simple tampering attacks. But, this isn'
 <br><br>
 
 ### Installation
-There are 3 ways to install this plugin:
-
-1. clone/download this repository and move the Plugins folder to your Unity project's Assets folder
-2. via Package Manager (**Add package from git url**):
-
-    - `https://github.com/onedevapp/Unity_GameGuard_Android.git`
-3. via Package Manager (add the following line to **Packages/manifest.json**):
-    - `"com.onedevapp.gameguard": "https://github.com/onedevapp/Unity_GameGuard_Android.git",`
-
+via Package Manager (**Add package from git url**):
+```
+https://github.com/onedevapp/Unity_GameGuard_Android.git
+```
 <br>
 
 ### How To
