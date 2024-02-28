@@ -12,23 +12,29 @@ namespace OneDevApp.GameGuard.Demo
         {
 
             GameGuardedStatus guardStatus = await new GameGuardBuilder()
-                .BlockPackageNameIsNotMatched("")
+                .BlockPackageNameIfNotMatched("")   //Dont use Application.identifier, just Hardcode the package name
                 .BlockDualOrCloneSpaceApps(true)
                 .BlockRunningInEmulator(true)
                 .BlockIfInstalledViaAPK(true)
+                .BlockIfRootedDevice(true)
+                .BlockIfUsingProxy(true)
+                .BlockIfDevOptionsEnabled(true)
                 .ToggleLogs(true)
                 .GetStatusAsync();  //GetStatusAsync or GetStatus
 
 
             /*bool isValid = new GameGuardBuilder()
-                .BlockPackageNameIsNotMatched("")
+                .BlockPackageNameIsNotMatched("com.DefaultCompany.MyAwesomeGame")
                 .BlockDualOrCloneSpaceApps(true)
                 .BlockRunningInEmulator(true)
                 .BlockIfInstalledViaAPK(true)
+                .BlockIfRootedDevice(true)
+                .BlockIfUsingProxy(true)
+                .BlockIfDevOptionsEnabled(true)
                 .ToggleLogs(true)
                 .Validate();    //ValidateAsync or Validate
             */
-            
+
             statusTxt.SetText("GameGuarded Status: \n" + guardStatus.ToString());
         }
     }

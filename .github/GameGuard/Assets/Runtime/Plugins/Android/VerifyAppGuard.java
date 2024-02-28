@@ -10,6 +10,9 @@ import android.os.Debug;
 import android.provider.Settings;
 import android.util.Base64;
 import android.util.Log;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStreamReader;
 
 import java.security.MessageDigest;
 
@@ -20,7 +23,7 @@ public class VerifyAppGuard {
     Activity currentAct;
     StringBuilder logBuilder;
 
-    public int guardAppWith(Activity act, String verifyAppSignature, String myPackageName, boolean noDualApp, boolean noEmulator, boolean noPackageInstaller, boolean noDebugger, boolean noDevOptionMode, boolean enableLogs, boolean getAppSignature)
+    public int guardAppWith(Activity act, String verifyAppSignature, String myPackageName, boolean noDualApp, boolean noEmulator, boolean noPackageInstaller, boolean noRoot, boolean noProxy, boolean noDebugger, boolean noDevOptionMode, boolean enableLogs, boolean getAppSignature)
     {
         currentAct = act;
         logBuilder = new StringBuilder();
@@ -192,6 +195,59 @@ public class VerifyAppGuard {
             logBuilder.append("--------------------------------").append("\n");
         }
 
+        if(noRoot)
+        {
+            logBuilder.append("Started RootCheck validation").append("\n");
+            logBuilder.append("--------------------------------").append("\n");
+
+            if(checkRootMethod1() || checkRootMethod2() || checkRootMethod3())
+            {
+                if(enableLogs)
+                {
+                    logBuilder.append("Stopped at RootCheck validation").append("\n");
+                    Log.d("VerifyAppGuard", logBuilder.toString());
+                }
+                else
+                {
+                    logBuilder.setLength(0);
+                }
+                return 9;
+            }
+
+            logBuilder.append("--------------------------------").append("\n");
+        }
+
+        if(noProxy)
+        {
+            logBuilder.append("Started Proxy validation").append("\n");
+            logBuilder.append("--------------------------------").append("\n");
+
+            String proxyHost = System.getProperty("https.proxyHost");
+            if (proxyHost == null || proxyHost.trim().isEmpty())
+                proxyHost = System.getProperty("http.proxyHost");
+            String proxyPort = System.getProperty("https.proxyPort");
+            if (proxyPort == null || proxyPort.trim().isEmpty())
+                proxyPort = System.getProperty("http.proxyPort");
+
+            if(!(proxyHost == null || proxyHost.trim().isEmpty()) && !(proxyPort == null || proxyPort.trim().isEmpty()))
+            {
+                if(enableLogs)
+                {
+                    logBuilder.append("Stopped at Proxy validation").append("\n");
+                    logBuilder.append("proxyHost::").append(proxyHost).append("\n");
+                    logBuilder.append("proxyPort::").append(proxyPort).append("\n");
+                    Log.d("VerifyAppGuard", logBuilder.toString());
+                }
+                else
+                {
+                    logBuilder.setLength(0);
+                }
+                return 10;
+            }
+
+            logBuilder.append("--------------------------------").append("\n");
+        }
+
         if(noDebugger)
         {
             logBuilder.append("Started Debugger validation").append("\n");
@@ -208,7 +264,7 @@ public class VerifyAppGuard {
                 {
                     logBuilder.setLength(0);
                 }
-                return 9;
+                return 11;
             }
             logBuilder.append("--------------------------------").append("\n");
         }
@@ -229,7 +285,7 @@ public class VerifyAppGuard {
                 {
                     logBuilder.setLength(0);
                 }
-                return 10;
+                return 12;
             }
             logBuilder.append("--------------------------------").append("\n");
         }
@@ -374,12 +430,8 @@ public class VerifyAppGuard {
         boolean result = false;
 
         try {
-            String keys = Build.TAGS;
-            result =  (keys != null && keys.contains("test-keys"));
-
-            if(!result){
-                result = Debug.isDebuggerConnected();
-            }
+            
+            result = Debug.isDebuggerConnected();
 
             if(!result){
                 result = currentAct.getApplicationContext().getApplicationInfo().flags != 0 && ApplicationInfo.FLAG_DEBUGGABLE != 0;
@@ -446,5 +498,45 @@ public class VerifyAppGuard {
             Log.d("VerifyAppGuard", exception.getStackTrace().toString());
         }
         return "";
+    }
+
+    /**
+     * Checking the BUILD tag for test-keys. By default, stock Android ROMs from Google are built with release-keys tags.
+     * If test-keys are present, this can mean that the Android build on the device is either a developer build or
+     * an unofficial Google build.
+     */
+    private boolean checkRootMethod1() {
+        String buildTags = android.os.Build.TAGS;
+        return buildTags != null && buildTags.contains("test-keys");
+    }
+
+    /**
+     * check if /system/app/Superuser.apk is present
+     * This package is most often looked for on rooted devices. Superuser allows the user to authorize applications to run as root on the device.
+     */
+    private boolean checkRootMethod2() {
+        String[] paths = {"/system/app/Superuser.apk", "/sbin/su", "/system/bin/su", "/system/xbin/su", "/data/local/xbin/su", "/data/local/bin/su", "/system/sd/xbin/su",
+                "/system/bin/failsafe/su", "/data/local/su"};
+        for (String path : paths) {
+            if (new File(path).exists()) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Check if the SU command was successful
+     * Execute su and then id to check if the current user has a uid of 0 or if it contains (root).
+     */
+    private boolean checkRootMethod3() {
+        Process process = null;
+        try {
+            process = Runtime.getRuntime().exec(new String[]{"/system/xbin/which", "su"});
+            BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            return in.readLine() != null;
+        } catch (Throwable t) {
+            return false;
+        } finally {
+            if (process != null) process.destroy();
+        }
     }
 }

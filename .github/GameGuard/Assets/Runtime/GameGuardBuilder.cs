@@ -19,6 +19,8 @@ namespace OneDevApp.GameGuard
         InClonedSpace,
         ZygoteCountTwice,
         IsEmulator,
+        IsRooted,
+        UsingProxy,
         Debugger,
         DevOptions
     }
@@ -47,7 +49,7 @@ namespace OneDevApp.GameGuard
         /// </summary>
         /// <param name="packageName">Package Name to be verified</param>
         /// <returns></returns>
-        public GameGuardBuilder BlockPackageNameIsNotMatched(string packageName)
+        public GameGuardBuilder BlockPackageNameIfNotMatched(string packageName)
         {
             _gameGuard.myPackageName = packageName;
             return this;
@@ -88,6 +90,39 @@ namespace OneDevApp.GameGuard
         }
 
         /// <summary>
+        /// Checks if the device is rooted.
+        /// </summary>
+        /// <param name="block">true to block and default is false</param>
+        /// <returns></returns>
+        public GameGuardBuilder BlockIfRootedDevice(bool block)
+        {
+            _gameGuard.noRoot = block;
+            return this;
+        }
+
+        /// <summary>
+        /// Checks if the device using proxy.
+        /// </summary>
+        /// <param name="block">true to block and default is false</param>
+        /// <returns></returns>
+        public GameGuardBuilder BlockIfUsingProxy(bool block)
+        {
+            _gameGuard.noProxy = block;
+            return this;
+        }
+
+        /// <summary>
+        /// Checks the device whether Developer Options is enabled or not.
+        /// </summary>
+        /// <param name="block">true to block and default is false</param>
+        /// <returns></returns>
+        public GameGuardBuilder BlockIfDevOptionsEnabled(bool block)
+        {
+            _gameGuard.noDevOptions = block;
+            return this;
+        }
+
+        /// <summary>
         /// Check whether the source of installation is APK or not, by doing so, we are allowing only installing APP via any Store such as PlayStore, Amazon Store etc.
         /// </summary>
         /// <param name="showLogs">true to show Logs and default is false</param>
@@ -101,7 +136,7 @@ namespace OneDevApp.GameGuard
         /// <summary>
         /// Verify the game guard with the config values
         /// </summary>
-        /// <returns>true is any conditions met else false and other than supported platform (Android) always return false</returns>
+        /// <returns>true is any conditions not met else false and other than supported platform (Android) always return true</returns>
         public bool Validate()
         {
             int status = 0;
@@ -109,7 +144,7 @@ namespace OneDevApp.GameGuard
             status = _gameGuard.validateGame();
 #endif
             _gameGuard.Dispose();
-            return status != 0;
+            return status == 0;
         }
 
         /// <summary>
@@ -130,7 +165,7 @@ namespace OneDevApp.GameGuard
         /// <summary>
         /// Verify the game guard with the config values
         /// </summary>
-        /// <returns>true is any conditions met else false and other than supported platform (Android) always return false</returns>
+        /// <returns>true is any conditions not met else false and other than supported platform (Android) always return true</returns>
         public async Task<bool> ValidateAsync()
         {
             int status = 0;
@@ -138,7 +173,7 @@ namespace OneDevApp.GameGuard
             status = await _gameGuard.validateGameAysnc();
 #endif
             _gameGuard.Dispose();
-            return status != 0;
+            return status == 0;
         }
 
         /// <summary>
@@ -169,6 +204,8 @@ namespace OneDevApp.GameGuard
         internal bool noDualOrCloneSpace { get; set; }
         internal bool noEmulator { get; set; }
         internal bool noPackageInstaller { get; set; }
+        internal bool noRoot { get; set; }
+        internal bool noProxy { get; set; }
         internal bool noDevOptions { get; set; }
         internal bool enableLogs { get; set; }
         internal bool showSignature { get; set; }
@@ -185,7 +222,7 @@ namespace OneDevApp.GameGuard
                 using (AndroidJavaObject obj_Activity = cls_UnityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
                 {
 
-                    return cls_jni.Call<int>("guardAppWith", obj_Activity, myAppSignature, myPackageName, noDualOrCloneSpace, noEmulator, noPackageInstaller, noDevOptions, noDevOptions, enableLogs, showSignature);
+                    return cls_jni.Call<int>("guardAppWith", obj_Activity, myAppSignature, myPackageName, noDualOrCloneSpace, noEmulator, noPackageInstaller, noRoot, noProxy, noDevOptions, noDevOptions, enableLogs, showSignature);
 
                 }
             }
@@ -203,7 +240,7 @@ namespace OneDevApp.GameGuard
 
                     using (AndroidJavaObject obj_Activity = cls_UnityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
                     {
-                        int toReturn = cls_jni.Call<int>("guardAppWith", obj_Activity, myAppSignature, myPackageName, noDualOrCloneSpace, noEmulator, noPackageInstaller, noDevOptions, noDevOptions, enableLogs, showSignature);
+                        int toReturn = cls_jni.Call<int>("guardAppWith", obj_Activity, myAppSignature, myPackageName, noDualOrCloneSpace, noEmulator, noPackageInstaller, noRoot, noProxy, noDevOptions, noDevOptions, enableLogs, showSignature);
                         AndroidJNI.DetachCurrentThread();
                         return toReturn;
                     }

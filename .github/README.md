@@ -20,22 +20,30 @@ Create a new GameGuardBuilder object.
 ```C#
 GameGuardBuilder guardBuiler = new GameGuardBuilder()
 ```
+<br>
 
 ### Verify your app's signing certificates (signatures)
 The app signatures will be broken if the .apk is altered in any way and doesn't match with originaly signed signature.
+
+> [!Warning]
+> Don't use this method when using Google Play App Signing since Google removes the original signature and add another one, so this method will fail.
 <br>
 ```C#
-// appSignature : The original APK signature for the PRODUCTION version
+// appSignature : The original APK signature for the PRODUCTION version, empty value will not validate signature
 // showSignature : If ture then certificate signature will be print to the logcat.
 guardBuiler.BlockAppSingatureIsNotMatched(string appSignature, bool showSignature = false)
 ```
+
+> [!Note]
+> To get the App signature, pass empty string with showSignature as true, once you had your signature, set appSignature with your signature and showSignature as false to validate
+
 
 ### Verify your app package name
 Set the package name to validate whether the current app was running with the exact same package name specified, because some tools can change the package name while rebuilding the APK from the original
 <br>
 
 ```C#
-guardBuiler.BlockPackageNameIsNotMatched(string packageName)
+guardBuiler.BlockPackageNameIsNotMatched(string packageName)    //Dont use Application.identifier, just Hardcode the package name
 ```
 
 ### Verify the installation source
@@ -67,6 +75,34 @@ Note: Disabling Emulator might leads to Users loss, since few percentage of user
 guardBuiler.BlockRunningInEmulator(bool block)
 ```
 
+### Verify if device is rooted
+Checks if the device is rooted. 
+<br>
+
+```C#
+// block : true to block and default is false
+guardBuiler.BlockIfRootedDevice(bool block)
+```
+
+### Verify if device usign proxy
+Checks if the device using proxy.
+<br>
+
+```C#
+// block : true to block and default is false
+guardBuiler.BlockIfUsingProxy(bool block)
+```
+
+### Verify if developer options enabled
+Checks the device whether Developer Options is enabled or not. Note that by enabling this, it also checks for whether Debugger is attched
+<br>
+
+```C#
+// block : true to block and default is false
+guardBuiler.BlockIfDevOptionsEnabled(bool block)
+```
+
+
 ### Logs
 Toggle logs
 
@@ -84,11 +120,14 @@ bool isValid = await guardBuiler.ValidateAsync();
 
 //Complete Sample
 bool isValid = new GameGuardBuilder()
-    .BlockPackageNameIsNotMatched("")
+    .BlockPackageNameIsNotMatched("com.DefaultCompany.MyAwesomeGame")   //Dont use Application.identifier, just Hardcode the package name
     .BlockDualOrCloneSpaceApps(true)
     .BlockRunningInEmulator(true)
     .BlockIfInstalledViaAPK(true)
-    .ToggleLogs(false)
+    .BlockIfRootedDevice(true)
+    .BlockIfUsingProxy(true)
+    .BlockIfDevOptionsEnabled(true)
+    .ToggleLogs(true)
     .Validate();    //ValidateAsync or Validate
 ```
 
@@ -107,6 +146,8 @@ public enum GameGuardedStatus
     InClonedSpace,
     ZygoteCountTwice,
     IsEmulator,
+    IsRooted,
+    UsingProxy,
     Debugger,
     DevOptions
 }
@@ -116,11 +157,14 @@ GameGuardedStatus guardStatus = await guardBuiler.GetStatusAsync();
 
 //Complete Sample
 GameGuardedStatus guardStatus = await new GameGuardBuilder()
-    .BlockPackageNameIsNotMatched("")
+    .BlockPackageNameIfNotMatched("com.DefaultCompany.MyAwesomeGame")   //Dont use Application.identifier, just Hardcode the package name
     .BlockDualOrCloneSpaceApps(true)
     .BlockRunningInEmulator(true)
     .BlockIfInstalledViaAPK(true)
-    .ToggleLogs(false)
+    .BlockIfRootedDevice(true)
+    .BlockIfUsingProxy(true)
+    .BlockIfDevOptionsEnabled(true)
+    .ToggleLogs(true)
     .GetStatusAsync();  //GetStatusAsync or GetStatus
 
 ```
