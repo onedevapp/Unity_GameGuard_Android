@@ -27,7 +27,9 @@ The app signatures will be broken if the .apk is altered in any way and doesn't 
 
 > [!Warning]
 > Don't use this method when using Google Play App Signing since Google removes the original signature and add another one, so this method will fail.
+
 <br>
+
 ```C#
 // appSignature : The original APK signature for the PRODUCTION version, empty value will not validate signature
 // showSignature : If ture then certificate signature will be print to the logcat.
