@@ -13,6 +13,7 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import com.reveny.emulator.detection.EmulatorDetection;
 
 import java.security.MessageDigest;
 
@@ -179,11 +180,14 @@ public class VerifyAppGuard {
             logBuilder.append("Started Emulator validation").append("\n");
             logBuilder.append("--------------------------------").append("\n");
 
-            if(isEmulator())
+            //Create a new EmulatorDetection object.
+            EmulatorDetection detection = new EmulatorDetection();
+            if(detection.isDetected())
             {
                 if(enableLogs)
                 {
                     logBuilder.append("Stopped at Emulator validation").append("\n");
+                    logBuilder.append(detection.getResult()).append("\n");
                     Log.d("VerifyAppGuard", logBuilder.toString());
                 }
                 else
@@ -378,59 +382,11 @@ public class VerifyAppGuard {
         return count;
     }
 
-    private boolean isEmulator()
-    {
-        logBuilder.append("Build.MANUFACTURER:::").append(Build.MANUFACTURER).append("\n");
-        logBuilder.append("Build.BRAND:::").append(Build.BRAND).append("\n");
-        logBuilder.append("Build.FINGERPRINT:::").append(Build.FINGERPRINT).append("\n");
-        logBuilder.append("Build.PRODUCT:::").append(Build.PRODUCT).append("\n");
-        logBuilder.append("Build.MODEL:::").append(Build.MODEL).append("\n");
-        logBuilder.append("Build.BOARD:::").append(Build.BOARD).append("\n");
-        logBuilder.append("Build.HOST:::").append(Build.HOST).append("\n");
-        logBuilder.append("Build.DEVICE:::").append(Build.DEVICE).append("\n");
-        logBuilder.append("Build.HARDWARE:::").append(Build.HARDWARE).append("\n");
-        logBuilder.append("--------------------------------").append("\n");
-
-        return ((Build.MANUFACTURER == "Google" && Build.BRAND == "google" &&
-                ((Build.FINGERPRINT.startsWith("google/sdk_gphone_")
-                        && Build.FINGERPRINT.endsWith(":user/release-keys")
-                        && Build.PRODUCT.startsWith("sdk_gphone_")
-                        && Build.MODEL.startsWith("sdk_gphone_"))
-                        //alternative
-                        || (Build.FINGERPRINT.startsWith("google/sdk_gphone64_")
-                        && (Build.FINGERPRINT.endsWith(":userdebug/dev-keys") || Build.FINGERPRINT.endsWith(":user/release-keys"))
-                        && Build.PRODUCT.startsWith("sdk_gphone64_")
-                        && Build.MODEL.startsWith("sdk_gphone64_"))))
-                //
-                || Build.PRODUCT.contains("simulator")
-                || Build.PRODUCT.contains("sdk_gphone64_arm64")
-                || Build.FINGERPRINT.startsWith("generic")
-                || Build.FINGERPRINT.startsWith("unknown")
-                || Build.FINGERPRINT.equals("robolectric")
-                || Build.MODEL.contains("google_sdk")
-                || Build.MODEL.contains("Emulator")
-                || Build.MODEL.contains("Android SDK built for x86")
-                //bluestacks
-                || Build.MANUFACTURER.contains("Geny")
-                || Build.HOST.startsWith("Build")
-                || Build.MANUFACTURER.equals("unknown")
-                //MSI App Player
-                || Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic")
-                || Build.PRODUCT == "google_sdk"
-                //nox
-                || Build.PRODUCT.toLowerCase().contains("nox")
-                || Build.BOARD.toLowerCase().contains("nox")
-                // another Android SDK emulator check
-                || Build.DEVICE.equals("vbox86p")
-                || Build.HARDWARE.equals("goldfish")
-                || Build.HARDWARE.equals("vbox86"));
-    }
-
     private boolean detectDebugger() {
         boolean result = false;
 
         try {
-            
+
             result = Debug.isDebuggerConnected();
 
             if(!result){

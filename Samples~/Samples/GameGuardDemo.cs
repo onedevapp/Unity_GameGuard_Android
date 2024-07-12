@@ -15,10 +15,10 @@ namespace OneDevApp.GameGuard.Demo
                 .BlockPackageNameIfNotMatched("")   //Dont use Application.identifier, just Hardcode the package name
                 .BlockDualOrCloneSpaceApps(true)
                 .BlockRunningInEmulator(true)
-                .BlockIfInstalledViaAPK(true)
-                .BlockIfRootedDevice(true)
-                .BlockIfUsingProxy(true)
-                .BlockIfDevOptionsEnabled(true)
+                .BlockIfInstalledViaAPK(false)
+                .BlockIfRootedDevice(false)
+                .BlockIfUsingProxy(false)
+                .BlockIfDevOptionsEnabled(false)
                 .ToggleLogs(true)
                 .GetStatusAsync();  //GetStatusAsync or GetStatus
 

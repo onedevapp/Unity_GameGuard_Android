@@ -45,7 +45,7 @@ Set the package name to validate whether the current app was running with the ex
 <br>
 
 ```C#
-guardBuiler.BlockPackageNameIsNotMatched(string packageName)    //Dont use Application.identifier, just Hardcode the package name
+guardBuiler.BlockPackageNameIsNotMatched(string packageName)    // Dont use Application.identifier, just Hardcode/pass the value from server
 ```
 
 ### Verify the installation source
@@ -66,10 +66,13 @@ Some tools can run the build in Clone or Dual Space to hack the game
 guardBuiler.BlockDualOrCloneSpaceApps(bool block)
 ```
 
-### Verify if app is being run in an emulator
-Emulators are mostly widley used to hack the games.
+### Verify if app is running in an emulator
+Emulators are most widley used to hack the games.
 <br>
-Note: Disabling Emulator might leads to Users loss, since few percentage of users actually enjoys playing the emulators than the actual device. Also this will not detect most of the emulators or the newest one.
+
+Note: 
+* Disabling Emulator might leads to users loss, since few percentage of users actually enjoys playing in the emulators than the actual device.
+* Uses [Android-Emulator-Detection](https://github.com/reveny/Android-Emulator-Detection.git) library by [reveny](https://github.com/reveny) to detect emulator 
 <br>
 
 ```C#
@@ -109,7 +112,7 @@ guardBuiler.BlockIfDevOptionsEnabled(bool block)
 Toggle logs
 
 ```C#
-//By default puglin console log will be diabled, but can be enabled
+// By default puglin console log will be diabled, but can be enabled
 guardBuiler.ToggleLogs(bool showLogs);
 ```
 
@@ -117,12 +120,12 @@ guardBuiler.ToggleLogs(bool showLogs);
 
 ```C#
 // Verify the game guard with the config values
-bool isValid = guardBuiler.Validate();  //or
+bool isValid = guardBuiler.Validate();  // or
 bool isValid = await guardBuiler.ValidateAsync();
 
-//Complete Sample
+// Complete Sample
 bool isValid = new GameGuardBuilder()
-    .BlockPackageNameIsNotMatched("com.DefaultCompany.MyAwesomeGame")   //Dont use Application.identifier, just Hardcode the package name
+    .BlockPackageNameIsNotMatched("com.DefaultCompany.MyAwesomeGame")   // Dont use Application.identifier, just Hardcode the package name
     .BlockDualOrCloneSpaceApps(true)
     .BlockRunningInEmulator(true)
     .BlockIfInstalledViaAPK(true)
@@ -130,13 +133,13 @@ bool isValid = new GameGuardBuilder()
     .BlockIfUsingProxy(true)
     .BlockIfDevOptionsEnabled(true)
     .ToggleLogs(true)
-    .Validate();    //ValidateAsync or Validate
+    .Validate();    // ValidateAsync or Validate
 ```
 
 ### Get Validation Status
 
 ```C#
-//or get more details with game guard status
+// or get more details with game guard status
 public enum GameGuardedStatus
 {
     Valid = 0,
@@ -157,9 +160,9 @@ public enum GameGuardedStatus
 GameGuardedStatus guardStatus = guardBuiler.GetStatus();  //or
 GameGuardedStatus guardStatus = await guardBuiler.GetStatusAsync();
 
-//Complete Sample
+// Complete Sample
 GameGuardedStatus guardStatus = await new GameGuardBuilder()
-    .BlockPackageNameIfNotMatched("com.DefaultCompany.MyAwesomeGame")   //Dont use Application.identifier, just Hardcode the package name
+    .BlockPackageNameIfNotMatched("com.DefaultCompany.MyAwesomeGame")   // Dont use Application.identifier, just Hardcode the package name
     .BlockDualOrCloneSpaceApps(true)
     .BlockRunningInEmulator(true)
     .BlockIfInstalledViaAPK(true)
@@ -167,21 +170,16 @@ GameGuardedStatus guardStatus = await new GameGuardBuilder()
     .BlockIfUsingProxy(true)
     .BlockIfDevOptionsEnabled(true)
     .ToggleLogs(true)
-    .GetStatusAsync();  //GetStatusAsync or GetStatus
+    .GetStatusAsync();  // GetStatusAsync or GetStatus
 
 ```
 <br>
 
 ## Recommendaton
+* [ByteProtector](https://assetstore.unity.com/packages/tools/utilities/byteprotector-mobile-anti-cheat-286004) - ByteProtector is a lightweight anti-cheat for Android™ games. It helps game developers detect cheating methods like code injections, debuggers, emulators, root, and Xposed.
 * [Anti-Cheat Toolkit](https://assetstore.unity.com/packages/tools/utilities/anti-cheat-toolkit-2023-202695) - Protects variables & saves, detects plenty of cheats and many more.
 * [Obfuscator](https://assetstore.unity.com/packages/tools/utilities/obfuscator-48919) - This asset obfuscates your code making it harder for bad guys to reverse engineer your projects.
 * [Mfuscator: IL2CPP Encryption](https://assetstore.unity.com/packages/tools/utilities/mfuscator-il2cpp-encryption-256631) - Protect Unity IL2CPP builds using etadata encryption and initialization pattern obfuscation and impede the reverse-engineering efforts of hackers targeting your game.
-
-<br>
-
-## Reference
-https://proandroiddev.com/preventing-android-app-cloning-e3194269bcfa
-https://medium.com/avi-parshan-studios/protecting-your-android-app-against-reverse-engineering-and-tampering-a727768b2e9e
 
 <br>
 
