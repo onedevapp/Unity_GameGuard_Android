@@ -7,10 +7,11 @@ This library protects your game against simple tampering attacks. But, this isn'
 <br><br>
 
 ### Installation
-via Package Manager (**Add package from git url**):
-```
-https://github.com/onedevapp/Unity_GameGuard_Android.git
-```
+
+* Open Package Manager in Unity
+* Press "+" and "Add package from git URL..."
+* Enter this repository and version as  `https://github.com/onedevapp/Unity_GameGuard_Android.git#TAG` (see latest version [here](https://github.com/onedevapp/Unity_GameGuard_Android/tags))
+
 <br>
 
 ### How To
